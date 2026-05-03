@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+:root {
+  --red: #A6151D;
+  --grey: #3E3E3E;
+}
+
+@theme inline {
+  --font-mono: var(--font-space-mono), "Courier New", Courier, monospace;
+}
+
+body {
+  background: #000;
+  color: #D4D4D4;
+  font-family: var(--font-space-mono), "Courier New", Courier, monospace;
+}
