@@ -52,7 +52,8 @@ export default function Home() {
         </div>
 
         {/* Device grid */}
-        <p className="text-xs uppercase tracking-widest text-[#565656] mb-6">Select a device</p>
+        <p className="text-xs uppercase tracking-widest text-[#565656] mb-2">Select a device</p>
+        <p className="text-xs text-[#565656] mb-6">Tap any device to trace where your data goes →</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#565656]">
           {devices.map((device) => {
             const maxSeverity = device.dataPoints.reduce<"low" | "medium" | "high" | "critical">((max, dp) => {
@@ -65,7 +66,7 @@ export default function Home() {
               <Link
                 key={device.slug}
                 href={`/devices/${device.slug}`}
-                className="group bg-black p-6 hover:bg-[#0d0d0d] transition-colors duration-150"
+                className="group bg-black p-6 hover:bg-[#0d0d0d] border border-transparent hover:border-[#A6151D]/50 transition-all duration-150"
               >
                 <div className="flex items-start justify-between mb-5">
                   <div className="flex flex-col gap-1">
@@ -85,9 +86,9 @@ export default function Home() {
                 </h2>
                 <p className="text-xs text-[#565656] mb-4 uppercase tracking-widest">{device.category}</p>
                 <p className="text-sm text-[#565656] leading-relaxed font-medium">{device.description}</p>
-                <div className="mt-5 pt-4 border-t border-[#565656] flex items-center justify-between text-xs text-[#565656]">
-                  <span>{device.dataPoints.length} data types tracked</span>
-                  <span className="group-hover:text-[#D4D4D4] transition-colors">→</span>
+                <div className="mt-5 pt-4 border-t border-[#565656] flex items-center justify-between text-xs">
+                  <span className="text-[#565656]">{device.dataPoints.length} data types tracked</span>
+                  <span className="text-[#A6151D] uppercase tracking-widest group-hover:tracking-[0.2em] transition-all duration-150">Explore →</span>
                 </div>
               </Link>
             );
