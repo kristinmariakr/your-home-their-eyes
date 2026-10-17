@@ -251,7 +251,7 @@ export default function DiagramClient() {
       {/* SELECTION */}
       <div
         style={{
-          position:'fixed',inset:0,background:'#f5f0e8',
+          position:'fixed',inset:0,background:'#ffffff',
           display:'flex',flexDirection:'column',alignItems:'center',
           padding:'32px 24px 24px',overflowY:'auto',
           fontFamily:"'Roboto Mono', monospace",
@@ -295,7 +295,7 @@ export default function DiagramClient() {
         <button
           onClick={launch}
           style={{
-            background:'#111',color:'#f5f0e8',border:'none',borderRadius:2,
+            background:'#111',color:'#ffffff',border:'none',borderRadius:2,
             padding:'14px 40px',fontFamily:"'Roboto Mono', monospace",
             fontSize:'clamp(10px,2.8vw,12px)',letterSpacing:'0.18em',
             textTransform:'uppercase',cursor:'pointer',
