@@ -262,7 +262,7 @@ export default function DiagramClient() {
         }}
       >
         <div style={{textAlign:'center',marginBottom:32}}>
-          <div style={{fontSize:'clamp(14px,4vw,18px)',fontWeight:500,letterSpacing:'0.18em',color:'#fff',textTransform:'uppercase'}}>
+          <div style={{fontSize:'clamp(28px,8vw,48px)',fontWeight:700,letterSpacing:'0.08em',color:'#fff',textTransform:'uppercase'}}>
             Trusted Devices
           </div>
           <div style={{marginTop:8,fontSize:'clamp(10px,2.5vw,12px)',color:'rgba(255,255,255,0.5)',letterSpacing:'0.08em',lineHeight:1.6}}>
