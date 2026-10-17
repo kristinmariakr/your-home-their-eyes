@@ -272,7 +272,7 @@ export default function DiagramClient() {
         <div style={{fontSize:'clamp(10px,2.8vw,12px)',letterSpacing:'0.14em',color:'#333',textTransform:'uppercase',marginBottom:16}}>
           Which devices do you own?
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,width:'100%',maxWidth:360,marginBottom:28}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr',gap:10,width:'100%',maxWidth:400,marginBottom:28}}>
           {DEV_KEYS.map(d => (
             <button
               key={d}
