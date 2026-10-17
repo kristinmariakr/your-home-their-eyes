@@ -269,7 +269,7 @@ export default function DiagramClient() {
             Select the smart devices in your home.<br/>See where your data travels.
           </div>
         </div>
-        <div style={{fontSize:'clamp(22px,6vw,32px)',fontWeight:700,letterSpacing:'0.06em',color:'#ffffff',textTransform:'uppercase',marginBottom:16}}>
+        <div style={{fontSize:'clamp(14px,4vw,18px)',fontWeight:700,letterSpacing:'0.1em',color:'#ffffff',textTransform:'uppercase',marginBottom:16}}>
           Which devices do you own?
         </div>
         <div style={{display:'grid',gridTemplateColumns:'1fr',gap:10,width:'100%',maxWidth:400,marginBottom:28}}>
