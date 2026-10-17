@@ -161,7 +161,7 @@ export default function DiagramClient() {
       ctx.fill();
       const lines = node.label.split('\n');
       const fs = node.kind==='home' ? 11 : 9;
-      ctx.font = `400 ${fs}px 'Roboto Mono', monospace`;
+      ctx.font = `400 ${fs}px 'Roboto Condensed', sans-serif`;
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.textBaseline = 'middle';
       const lh = fs*1.4, totalH = lines.length*lh, startY = node.y - totalH/2 + lh/2;
@@ -254,7 +254,7 @@ export default function DiagramClient() {
           position:'fixed',inset:0,background:'#ffffff',
           display:'flex',flexDirection:'column',alignItems:'center',
           padding:'32px 24px 24px',overflowY:'auto',
-          fontFamily:"'Roboto Mono', monospace",
+          fontFamily:"'Roboto Condensed', sans-serif",
           transition:'opacity 0.5s',
           opacity: screen==='select' ? 1 : 0,
           pointerEvents: screen==='select' ? 'auto' : 'none',
@@ -281,7 +281,7 @@ export default function DiagramClient() {
                 background: chosen.has(d) ? '#111' : '#fff',
                 border: `1.5px solid ${chosen.has(d) ? '#111' : '#ccc'}`,
                 borderRadius:2,padding:'22px 10px',
-                fontFamily:"'Roboto Mono', monospace",
+                fontFamily:"'Roboto Condensed', sans-serif",
                 fontSize:'clamp(13px,3.5vw,16px)',letterSpacing:'0.1em',
                 textTransform:'uppercase',
                 color: chosen.has(d) ? '#fff' : '#555',
@@ -296,7 +296,7 @@ export default function DiagramClient() {
           onClick={launch}
           style={{
             background:'#111',color:'#ffffff',border:'none',borderRadius:2,
-            padding:'14px 40px',fontFamily:"'Roboto Mono', monospace",
+            padding:'14px 40px',fontFamily:"'Roboto Condensed', sans-serif",
             fontSize:'clamp(10px,2.8vw,12px)',letterSpacing:'0.18em',
             textTransform:'uppercase',cursor:'pointer',
             opacity: chosen.size > 0 ? 1 : 0.3,
@@ -327,7 +327,7 @@ export default function DiagramClient() {
             position:'fixed',bottom:24,left:'50%',transform:'translateX(-50%)',
             background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.18)',
             borderRadius:2,padding:'10px 24px',
-            fontFamily:"'Roboto Mono', monospace",fontSize:10,
+            fontFamily:"'Roboto Condensed', sans-serif",fontSize:10,
             letterSpacing:'0.18em',color:'rgba(255,255,255,0.5)',
             cursor:'pointer',textTransform:'uppercase',zIndex:5,
           }}
