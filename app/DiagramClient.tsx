@@ -1,14 +1,15 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
-const DESTS_BY_DEVICE: Record<string, string[]> = {
-  vacuum:      ['mfr', 'amazon', 'contractors'],
-  doorbell:    ['amazon', 'law', 'brokers'],
-  speaker:     ['amazon', 'brokers', 'contractors'],
-  display:     ['amazon', 'brokers'],
-  bulb:        ['mfr', 'amazon'],
-  babymonitor: ['mfr', 'public'],
-  thermostat:  ['mfr', 'utilities'],
+// Chains: each entry is [device, intermediate, final destination]
+const CHAINS_BY_DEVICE: Record<string, string[][]> = {
+  vacuum:      [['vacuum','mfr','tech'], ['vacuum','mfr','contractors']],
+  doorbell:    [['doorbell','tech','law'], ['doorbell','tech','brokers']],
+  speaker:     [['speaker','tech','contractors'], ['speaker','tech','brokers']],
+  display:     [['display','tech','brokers']],
+  bulb:        [['bulb','mfr','tech']],
+  babymonitor: [['babymonitor','mfr','public']],
+  thermostat:  [['thermostat','mfr','utilities']],
 };
 
 const DEVICE_LABELS: Record<string, string> = {
@@ -21,9 +22,9 @@ const DEVICE_LABELS: Record<string, string> = {
   thermostat:  'SMART\nTHERMOSTAT',
 };
 
-const DEST_LABELS: Record<string, string> = {
+const NODE_LABELS: Record<string, string> = {
   mfr:         "MANUFACTURER'S\nCLOUD",
-  amazon:      'TECH\nCORPORATIONS',
+  tech:        'TECH\nCORPORATIONS',
   law:         'LAW\nENFORCEMENT',
   brokers:     'DATA\nBROKERS',
   contractors: 'OVERSEAS\nCONTRACTORS',
@@ -32,46 +33,88 @@ const DEST_LABELS: Record<string, string> = {
 };
 
 const DEV_KEYS = ['vacuum','doorbell','speaker','display','bulb','babymonitor','thermostat'];
-const DEST_KEYS = ['mfr','amazon','law','brokers','contractors','utilities','public'];
-const LW = 1600, LH = 920;
+const LW = 1700, LH = 920;
 
 interface Node { x: number; y: number; r: number; label: string; kind: string; }
-interface Seg { x0:number;y0:number;cx1:number;cy1:number;cx2:number;cy2:number;x1:number;y1:number; }
-interface Path { dev: string; dest: string; seg1: Seg; seg2: Seg; }
+interface Seg  { x0:number;y0:number;cx1:number;cy1:number;cx2:number;cy2:number;x1:number;y1:number; }
+interface AnimPath { dev: string; segs: Seg[]; }
 interface Dot  { pathIdx: number; t: number; speed: number; size: number; }
+
+function makeSeg(a: Node, b: Node): Seg {
+  const mx = (a.x + b.x) / 2;
+  return { x0:a.x, y0:a.y, cx1:mx, cy1:a.y, cx2:mx, cy2:b.y, x1:b.x, y1:b.y };
+}
 
 function buildNodes(): Record<string, Node> {
   const N: Record<string, Node> = {};
-  N['home'] = { x: 130, y: LH/2, r: 6, label: 'YOUR\nHOME', kind: 'home' };
+  N['home'] = { x: 100, y: LH/2, r: 6, label: 'YOUR\nHOME', kind: 'home' };
   const devSpacing = LH / (DEV_KEYS.length + 1);
   DEV_KEYS.forEach((k, i) => {
-    N[k] = { x: 420, y: devSpacing*(i+1), r: 4, label: DEVICE_LABELS[k], kind: 'device' };
+    N[k] = { x: 380, y: devSpacing*(i+1), r: 4, label: DEVICE_LABELS[k], kind: 'device' };
   });
-  const destSpacing = LH / (DEST_KEYS.length + 1);
-  DEST_KEYS.forEach((k, i) => {
-    N[k] = { x: 1370, y: destSpacing*(i+1), r: 4, label: DEST_LABELS[k], kind: 'dest' };
+  // Two intermediate nodes
+  N['mfr']  = { x: 880, y: LH*0.32, r: 5, label: NODE_LABELS['mfr'],  kind: 'mid' };
+  N['tech'] = { x: 880, y: LH*0.68, r: 5, label: NODE_LABELS['tech'], kind: 'mid' };
+  // Five final destination nodes
+  const destKeys = ['law','brokers','contractors','utilities','public'];
+  const destSpacing = LH / (destKeys.length + 1);
+  destKeys.forEach((k, i) => {
+    N[k] = { x: 1480, y: destSpacing*(i+1), r: 4, label: NODE_LABELS[k], kind: 'dest' };
   });
   return N;
 }
 
-function buildPaths(N: Record<string, Node>): Path[] {
-  const paths: Path[] = [];
-  DEV_KEYS.forEach(dev => {
-    (DESTS_BY_DEVICE[dev] || []).forEach(dest => {
-      const hN = N['home'], dN = N[dev], eN = N[dest];
-      const mid1 = (hN.x + dN.x) / 2;
-      const mid2 = (dN.x + eN.x) / 2;
-      paths.push({
-        dev, dest,
-        seg1: { x0:hN.x,y0:hN.y,cx1:mid1,cy1:hN.y,cx2:mid1,cy2:dN.y,x1:dN.x,y1:dN.y },
-        seg2: { x0:dN.x,y0:dN.y,cx1:mid2,cy1:dN.y,cx2:mid2,cy2:eN.y,x1:eN.x,y1:eN.y },
-      });
+// All unique static edges to draw as background lines
+function getAllEdges(): [string,string][] {
+  const seen = new Set<string>();
+  const edges: [string,string][] = [];
+  function add(a: string, b: string) {
+    const k = `${a}>${b}`;
+    if (!seen.has(k)) { seen.add(k); edges.push([a,b]); }
+  }
+  DEV_KEYS.forEach(d => add('home', d));
+  Object.values(CHAINS_BY_DEVICE).flat().forEach(chain => {
+    add(chain[0], chain[1]);
+    add(chain[1], chain[2]);
+  });
+  return edges;
+}
+
+function isEdgeActive(a: string, b: string, activeDevs: Set<string>): boolean {
+  if (a === 'home') return activeDevs.has(b);
+  for (const dev of activeDevs) {
+    for (const chain of CHAINS_BY_DEVICE[dev] || []) {
+      for (let i = 0; i < chain.length - 1; i++) {
+        if (chain[i] === a && chain[i+1] === b) return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isNodeActive(key: string, kind: string, activeDevs: Set<string>): boolean {
+  if (kind === 'home') return true;
+  if (kind === 'device') return activeDevs.has(key);
+  return [...activeDevs].some(dev =>
+    (CHAINS_BY_DEVICE[dev] || []).some(chain => chain.includes(key))
+  );
+}
+
+// Animated paths: home → device → mid → dest (3 bezier segments each)
+function buildAnimPaths(N: Record<string, Node>): AnimPath[] {
+  const paths: AnimPath[] = [];
+  Object.entries(CHAINS_BY_DEVICE).forEach(([dev, chains]) => {
+    chains.forEach(chain => {
+      const keys = ['home', ...chain];
+      const segs = [];
+      for (let i = 0; i < keys.length - 1; i++) segs.push(makeSeg(N[keys[i]], N[keys[i+1]]));
+      paths.push({ dev, segs });
     });
   });
   return paths;
 }
 
-function bezierPt(t:number, s:Seg) {
+function bezierPt(t: number, s: Seg) {
   const u = 1-t;
   return {
     x: u*u*u*s.x0 + 3*u*u*t*s.cx1 + 3*u*t*t*s.cx2 + t*t*t*s.x1,
@@ -79,8 +122,10 @@ function bezierPt(t:number, s:Seg) {
   };
 }
 
-function pathPt(t: number, seg1: Seg, seg2: Seg) {
-  return t <= 0.5 ? bezierPt(t*2, seg1) : bezierPt((t-0.5)*2, seg2);
+function pathPt(t: number, segs: Seg[]) {
+  const n = segs.length;
+  const idx = Math.min(Math.floor(t * n), n - 1);
+  return bezierPt(t * n - idx, segs[idx]);
 }
 
 export default function DiagramClient() {
@@ -88,12 +133,12 @@ export default function DiagramClient() {
   const [chosen, setChosen] = useState<Set<string>>(new Set());
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<{
-    animId: number|null; dots: Dot[]; paths: Path[]; nodes: Record<string,Node>;
+    animId: number|null; dots: Dot[]; animPaths: AnimPath[]; edges: [string,string][]; nodes: Record<string,Node>;
     activeDevs: Set<string>; panX:number; panY:number; sc:number;
     dragging:boolean; lastX:number; lastY:number;
     pinching:boolean; pinchStartDist:number; pinchStartSc:number;
     pinchStartPanX:number; pinchStartPanY:number; pinchMidX:number; pinchMidY:number;
-  }>({ animId:null, dots:[], paths:[], nodes:{}, activeDevs:new Set(),
+  }>({ animId:null, dots:[], animPaths:[], edges:[], nodes:{}, activeDevs:new Set(),
        panX:0, panY:0, sc:1, dragging:false, lastX:0, lastY:0,
        pinching:false, pinchStartDist:0, pinchStartSc:1,
        pinchStartPanX:0, pinchStartPanY:0, pinchMidX:0, pinchMidY:0 });
@@ -119,9 +164,9 @@ export default function DiagramClient() {
       cvs!.height = window.innerHeight;
       if (firstResize) {
         firstResize = false;
-        // Start zoomed in on the home node (logical x=130, y=LH/2)
+        // Start zoomed in on the home node (logical x=100, y=LH/2)
         s.sc = ((cvs!.height * 0.92) / LH) * 2.2;
-        s.panX = cvs!.width / 2 - 130 * s.sc;
+        s.panX = cvs!.width / 2 - 100 * s.sc;
         s.panY = cvs!.height / 2 - (LH / 2) * s.sc;
       }
     }
@@ -129,38 +174,39 @@ export default function DiagramClient() {
     window.addEventListener('resize', resize);
 
     s.nodes = buildNodes();
-    s.paths = buildPaths(s.nodes);
+    s.edges = getAllEdges();
+    s.animPaths = buildAnimPaths(s.nodes);
     s.dots = [];
-    s.paths.forEach((p, pi) => {
+    s.animPaths.forEach((p, pi) => {
       if (!s.activeDevs.has(p.dev)) return;
-      const speed = 0.0012 + Math.random()*0.0006;
+      const speed = 0.0009 + Math.random()*0.0005;
       for (let i=0;i<3;i++) s.dots.push({ pathIdx:pi, t:(i/3+Math.random()*0.1)%1, speed, size:2.5+Math.random()*1.5 });
     });
 
-    function isDestActive(k: string) {
-      return [...s.activeDevs].some(d => (DESTS_BY_DEVICE[d]||[]).includes(k));
-    }
-
-    function drawEdge(p: Path) {
-      const active = s.activeDevs.has(p.dev);
-      ctx.beginPath();
-      ctx.moveTo(p.seg1.x0, p.seg1.y0);
-      ctx.bezierCurveTo(p.seg1.cx1,p.seg1.cy1,p.seg1.cx2,p.seg1.cy2,p.seg1.x1,p.seg1.y1);
-      ctx.bezierCurveTo(p.seg2.cx1,p.seg2.cy1,p.seg2.cx2,p.seg2.cy2,p.seg2.x1,p.seg2.y1);
-      ctx.strokeStyle = active ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.04)';
-      ctx.lineWidth = active ? 1 : 0.5;
-      ctx.stroke();
+    function drawEdges() {
+      s.edges.forEach(([a, b]) => {
+        const nA = s.nodes[a], nB = s.nodes[b];
+        if (!nA || !nB) return;
+        const active = isEdgeActive(a, b, s.activeDevs);
+        const seg = makeSeg(nA, nB);
+        ctx.beginPath();
+        ctx.moveTo(seg.x0, seg.y0);
+        ctx.bezierCurveTo(seg.cx1,seg.cy1,seg.cx2,seg.cy2,seg.x1,seg.y1);
+        ctx.strokeStyle = active ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = active ? 1 : 0.5;
+        ctx.stroke();
+      });
     }
 
     function drawNode(key: string, node: Node) {
-      const isActive = node.kind==='home' || (node.kind==='device' && s.activeDevs.has(key)) || (node.kind==='dest' && isDestActive(key));
-      ctx.globalAlpha = isActive ? 1 : 0.2;
+      const active = isNodeActive(key, node.kind, s.activeDevs);
+      ctx.globalAlpha = active ? 1 : 0.15;
       ctx.beginPath();
       ctx.arc(node.x, node.y, node.r, 0, Math.PI*2);
       ctx.fillStyle = 'rgba(255,255,255,0.8)';
       ctx.fill();
       const lines = node.label.split('\n');
-      const fs = node.kind==='home' ? 11 : 9;
+      const fs = node.kind==='home' ? 11 : node.kind==='mid' ? 10 : 9;
       ctx.font = `400 ${fs}px 'Roboto Condensed', sans-serif`;
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.textBaseline = 'middle';
@@ -169,6 +215,9 @@ export default function DiagramClient() {
         ctx.textAlign='left';
         lines.forEach((ln,i) => ctx.fillText(ln, node.x+node.r+8, startY+i*lh));
       } else if (node.kind==='home') {
+        ctx.textAlign='center';
+        lines.forEach((ln,i) => ctx.fillText(ln, node.x, node.y+node.r+lh*(i+0.8)));
+      } else if (node.kind==='mid') {
         ctx.textAlign='center';
         lines.forEach((ln,i) => ctx.fillText(ln, node.x, node.y+node.r+lh*(i+0.8)));
       } else {
@@ -184,12 +233,12 @@ export default function DiagramClient() {
       ctx.save();
       ctx.translate(s.panX, s.panY);
       ctx.scale(s.sc, s.sc);
-      s.paths.forEach(p => drawEdge(p));
+      drawEdges();
       Object.entries(s.nodes).forEach(([k,n]) => drawNode(k,n));
       s.dots.forEach(dot => {
-        const p = s.paths[dot.pathIdx];
+        const p = s.animPaths[dot.pathIdx];
         dot.t = (dot.t + dot.speed) % 1;
-        const pt = pathPt(dot.t, p.seg1, p.seg2);
+        const pt = pathPt(dot.t, p.segs);
         ctx.save();
         ctx.shadowBlur=10; ctx.shadowColor='rgba(255,255,255,0.8)';
         ctx.beginPath(); ctx.arc(pt.x,pt.y,dot.size,0,Math.PI*2);
