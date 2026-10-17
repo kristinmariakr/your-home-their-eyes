@@ -23,7 +23,7 @@ const DEVICE_LABELS: Record<string, string> = {
 
 const DEST_LABELS: Record<string, string> = {
   mfr:         "MANUFACTURER'S\nCLOUD",
-  amazon:      'AMAZON /\nGOOGLE',
+  amazon:      'TECH\nCORPORATIONS',
   law:         'LAW\nENFORCEMENT',
   brokers:     'DATA\nBROKERS',
   contractors: 'OVERSEAS\nCONTRACTORS',
