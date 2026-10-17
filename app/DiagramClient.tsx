@@ -28,7 +28,7 @@ const DEST_LABELS: Record<string, string> = {
   brokers:     'DATA\nBROKERS',
   contractors: 'OVERSEAS\nCONTRACTORS',
   utilities:   'UTILITY\nCOMPANIES',
-  public:      'PUBLIC\nINTERNET',
+  public:      'VULNERABLE TO\nPUBLIC ACCESS',
 };
 
 const DEV_KEYS = ['vacuum','doorbell','speaker','display','bulb','babymonitor','thermostat'];
