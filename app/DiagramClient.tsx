@@ -321,20 +321,25 @@ export default function DiagramClient() {
           ref={canvasRef}
           style={{position:'absolute',inset:0,width:'100%',height:'100%',touchAction:'none',cursor:'grab'}}
         />
+      </div>
+
+      {/* Back button — outside canvas so touch events reach it */}
+      {screen === 'diagram' && (
         <button
           onClick={() => setScreen('select')}
           style={{
             position:'fixed',bottom:24,left:'50%',transform:'translateX(-50%)',
             background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.18)',
-            borderRadius:2,padding:'10px 24px',
-            fontFamily:"'Roboto Condensed', sans-serif",fontSize:10,
-            letterSpacing:'0.18em',color:'rgba(255,255,255,0.5)',
-            cursor:'pointer',textTransform:'uppercase',zIndex:5,
+            borderRadius:2,padding:'12px 28px',
+            fontFamily:"'Roboto Condensed', sans-serif",fontSize:12,
+            letterSpacing:'0.18em',color:'rgba(255,255,255,0.6)',
+            cursor:'pointer',textTransform:'uppercase',zIndex:50,
+            WebkitTapHighlightColor:'transparent',
           }}
         >
           ← Choose different devices
         </button>
-      </div>
+      )}
     </>
   );
 }
