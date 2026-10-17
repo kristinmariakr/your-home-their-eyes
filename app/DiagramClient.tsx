@@ -113,12 +113,17 @@ export default function DiagramClient() {
     const ctx = cvs.getContext('2d')!;
     const s = stateRef.current;
 
+    let firstResize = true;
     function resize() {
       cvs!.width = window.innerWidth;
       cvs!.height = window.innerHeight;
-      s.sc = (cvs!.height * 0.92) / LH;
-      s.panX = (cvs!.width - LW * s.sc) / 2;
-      s.panY = (cvs!.height - LH * s.sc) / 2;
+      if (firstResize) {
+        firstResize = false;
+        // Start zoomed in on the home node (logical x=130, y=LH/2)
+        s.sc = ((cvs!.height * 0.92) / LH) * 2.2;
+        s.panX = cvs!.width / 2 - 130 * s.sc;
+        s.panY = cvs!.height / 2 - (LH / 2) * s.sc;
+      }
     }
     resize();
     window.addEventListener('resize', resize);
