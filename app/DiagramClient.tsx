@@ -280,9 +280,9 @@ export default function DiagramClient() {
               style={{
                 background: chosen.has(d) ? '#111' : '#fff',
                 border: `1.5px solid ${chosen.has(d) ? '#111' : '#ccc'}`,
-                borderRadius:2,padding:'14px 10px',
+                borderRadius:2,padding:'22px 10px',
                 fontFamily:"'Roboto Mono', monospace",
-                fontSize:'clamp(9px,2.5vw,11px)',letterSpacing:'0.1em',
+                fontSize:'clamp(13px,3.5vw,16px)',letterSpacing:'0.1em',
                 textTransform:'uppercase',
                 color: chosen.has(d) ? '#fff' : '#555',
                 cursor:'pointer',textAlign:'center',lineHeight:1.4,
