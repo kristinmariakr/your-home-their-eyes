@@ -251,7 +251,7 @@ export default function DiagramClient() {
       {/* SELECTION */}
       <div
         style={{
-          position:'fixed',inset:0,background:'#ffffff',
+          position:'fixed',inset:0,background:'#090909',
           display:'flex',flexDirection:'column',alignItems:'center',
           padding:'32px 24px 24px',overflowY:'auto',
           fontFamily:"'Roboto Condensed', sans-serif",
@@ -262,14 +262,14 @@ export default function DiagramClient() {
         }}
       >
         <div style={{textAlign:'center',marginBottom:32}}>
-          <div style={{fontSize:'clamp(14px,4vw,18px)',fontWeight:500,letterSpacing:'0.18em',color:'#111',textTransform:'uppercase'}}>
+          <div style={{fontSize:'clamp(14px,4vw,18px)',fontWeight:500,letterSpacing:'0.18em',color:'#fff',textTransform:'uppercase'}}>
             Trusted Devices
           </div>
-          <div style={{marginTop:8,fontSize:'clamp(10px,2.5vw,12px)',color:'#666',letterSpacing:'0.08em',lineHeight:1.6}}>
+          <div style={{marginTop:8,fontSize:'clamp(10px,2.5vw,12px)',color:'rgba(255,255,255,0.5)',letterSpacing:'0.08em',lineHeight:1.6}}>
             Select the smart devices in your home.<br/>See where your data travels.
           </div>
         </div>
-        <div style={{fontSize:'clamp(10px,2.8vw,12px)',letterSpacing:'0.14em',color:'#333',textTransform:'uppercase',marginBottom:16}}>
+        <div style={{fontSize:'clamp(10px,2.8vw,12px)',letterSpacing:'0.14em',color:'rgba(255,255,255,0.6)',textTransform:'uppercase',marginBottom:16}}>
           Which devices do you own?
         </div>
         <div style={{display:'grid',gridTemplateColumns:'1fr',gap:10,width:'100%',maxWidth:400,marginBottom:28}}>
@@ -278,13 +278,13 @@ export default function DiagramClient() {
               key={d}
               onClick={() => toggleDevice(d)}
               style={{
-                background: chosen.has(d) ? '#111' : '#fff',
-                border: `1.5px solid ${chosen.has(d) ? '#111' : '#ccc'}`,
+                background: chosen.has(d) ? '#000' : '#111',
+                border: `1.5px solid ${chosen.has(d) ? '#000' : '#111'}`,
                 borderRadius:2,padding:'22px 10px',
                 fontFamily:"'Roboto Condensed', sans-serif",
                 fontSize:'clamp(13px,3.5vw,16px)',letterSpacing:'0.1em',
                 textTransform:'uppercase',
-                color: chosen.has(d) ? '#fff' : '#555',
+                color: chosen.has(d) ? '#fff' : 'rgba(255,255,255,0.75)',
                 cursor:'pointer',textAlign:'center',lineHeight:1.4,
               }}
             >
@@ -295,7 +295,7 @@ export default function DiagramClient() {
         <button
           onClick={launch}
           style={{
-            background:'#111',color:'#ffffff',border:'none',borderRadius:2,
+            background:'#fff',color:'#111',border:'none',borderRadius:2,
             padding:'14px 40px',fontFamily:"'Roboto Condensed', sans-serif",
             fontSize:'clamp(10px,2.8vw,12px)',letterSpacing:'0.18em',
             textTransform:'uppercase',cursor:'pointer',
